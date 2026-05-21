@@ -3,7 +3,6 @@ import pytest
 from unittest.mock import patch, MagicMock
 
 from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.flightradar24.const import DOMAIN
@@ -17,6 +16,7 @@ from homeassistant.const import (
 # =========================================================================
 # 1. CONFIG FLOW TESTS
 # =========================================================================
+
 
 @pytest.mark.asyncio
 async def test_setup_integration_mocked_api(hass: HomeAssistant):
@@ -37,14 +37,15 @@ async def test_setup_integration_mocked_api(hass: HomeAssistant):
 
     mock_client = MagicMock()
     mock_client.get_bounds_by_point.return_value = "53.0,51.0,4.0,6.0"
-    
+
     # We aggressively patch the processors to avoid hitting live flight data loops
     with (
-        patch("custom_components.flightradar24.FlightRadar24API", return_value=mock_client),
+        patch(
+            "custom_components.flightradar24.FlightRadar24API", return_value=mock_client
+        ),
         patch("custom_components.flightradar24.coordinator.FlightProcessor"),
         patch("custom_components.flightradar24.coordinator.AirportProcessor"),
     ):
-        
         assert await hass.config_entries.async_setup(entry.entry_id)
         await hass.async_block_till_done()
 
