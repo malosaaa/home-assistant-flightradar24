@@ -17,6 +17,7 @@ from homeassistant.const import (
 # 1. CONFIG FLOW TESTS
 # =========================================================================
 
+
 @pytest.mark.asyncio
 async def test_config_flow_success(hass: HomeAssistant):
     """Test successful initial config flow entry registration without auth."""
@@ -44,6 +45,7 @@ async def test_config_flow_success(hass: HomeAssistant):
 # 2. COORDINATOR & ENTITY PLATFORM TESTS
 # =========================================================================
 
+
 @pytest.mark.asyncio
 async def test_setup_integration_mocked_api(hass: HomeAssistant):
     """Test that all platforms initialize successfully when the API is mocked."""
@@ -63,12 +65,15 @@ async def test_setup_integration_mocked_api(hass: HomeAssistant):
 
     mock_client = MagicMock()
     mock_client.get_bounds_by_point.return_value = "53.0,51.0,4.0,6.0"
-    
+
     # We aggressively patch the processors to avoid hitting live flight data loops
-    with patch("custom_components.flightradar24.FlightRadar24API", return_value=mock_client), \
-         patch("custom_components.flightradar24.coordinator.FlightProcessor"), \
-         patch("custom_components.flightradar24.coordinator.AirportProcessor"):
-        
+    with (
+        patch(
+            "custom_components.flightradar24.FlightRadar24API", return_value=mock_client
+        ),
+        patch("custom_components.flightradar24.coordinator.FlightProcessor"),
+        patch("custom_components.flightradar24.coordinator.AirportProcessor"),
+    ):
         assert await hass.config_entries.async_setup(entry.entry_id)
         await hass.async_block_till_done()
 
