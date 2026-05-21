@@ -46,9 +46,9 @@ BUTTON_TYPES = (
 
 
 async def async_setup_entry(
-        hass: HomeAssistant,
-        entry: ConfigEntry,
-        async_add_entities: AddEntitiesCallback,
+    hass: HomeAssistant,
+    entry: ConfigEntry,
+    async_add_entities: AddEntitiesCallback,
 ) -> None:
     coordinator = hass.data[DOMAIN][entry.entry_id]
 
@@ -59,14 +59,16 @@ async def async_setup_entry(
     async_add_entities(buttons, False)
 
 
-class FlightRadar24ButtonEntity(CoordinatorEntity[FlightRadar24Coordinator], ButtonEntity):
+class FlightRadar24ButtonEntity(
+    CoordinatorEntity[FlightRadar24Coordinator], ButtonEntity
+):
     _attr_has_entity_name = True
     entity_description: FlightRadar24ButtonEntityDescription
 
     def __init__(
-            self,
-            coordinator: FlightRadar24Coordinator,
-            description: FlightRadar24ButtonEntityDescription,
+        self,
+        coordinator: FlightRadar24Coordinator,
+        description: FlightRadar24ButtonEntityDescription,
     ) -> None:
         super().__init__(coordinator)
 

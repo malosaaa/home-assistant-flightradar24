@@ -11,9 +11,9 @@ from .coordinator import FlightRadar24Coordinator
 
 
 async def async_setup_entry(
-        hass: HomeAssistant,
-        entry: ConfigEntry,
-        async_add_entities: AddEntitiesCallback,
+    hass: HomeAssistant,
+    entry: ConfigEntry,
+    async_add_entities: AddEntitiesCallback,
 ) -> None:
     coordinator = hass.data[DOMAIN][entry.entry_id]
     async_add_entities([FlightRadar24ScanEntity(coordinator)], False)
@@ -35,7 +35,9 @@ class FlightRadar24ScanEntity(
             icon="mdi:connection",
             entity_category=EntityCategory.CONFIG,
         )
-        self._attr_unique_id = f"{coordinator.unique_id}_{DOMAIN}_{self.entity_description.key}"
+        self._attr_unique_id = (
+            f"{coordinator.unique_id}_{DOMAIN}_{self.entity_description.key}"
+        )
 
     @property
     def is_on(self) -> bool:

@@ -18,22 +18,23 @@ from FlightRadar24 import FlightRadar24API, Entity
 
 
 class FlightRadar24Coordinator(DataUpdateCoordinator[int]):
-
     def __init__(
-            self,
-            hass: HomeAssistant,
-            bounds: str,
-            client: FlightRadar24API,
-            update_interval: int,
-            logger: Logger,
-            unique_id: str,
-            min_altitude: int,
-            max_altitude: int,
-            point: Entity,
+        self,
+        hass: HomeAssistant,
+        bounds: str,
+        client: FlightRadar24API,
+        update_interval: int,
+        logger: Logger,
+        unique_id: str,
+        min_altitude: int,
+        max_altitude: int,
+        point: Entity,
     ) -> None:
         self.unique_id = unique_id
         self.event_manager = EventManager()
-        self.flight = FlightProcessor(client, self.event_manager, min_altitude, max_altitude, point, bounds)
+        self.flight = FlightProcessor(
+            client, self.event_manager, min_altitude, max_altitude, point, bounds
+        )
         self.airport = AirportProcessor(client)
         self.enable_tracker: bool = False
         self.scanning: bool = True
@@ -53,27 +54,35 @@ class FlightRadar24Coordinator(DataUpdateCoordinator[int]):
 
     async def add_flight_track(self, number: str) -> None:
         if not self.scanning:
-            self.logger.error('FlightRadar24: API data fetching if OFF')
+            self.logger.error("FlightRadar24: API data fetching if OFF")
             return
         try:
-            found = await self.hass.async_add_executor_job(self.flight.add_track, number)
+            found = await self.hass.async_add_executor_job(
+                self.flight.add_track, number
+            )
             if not found:
-                self.logger.error('FlightRadar24: Add Track - No flight found by - {}'.format(number))
+                self.logger.error(
+                    "FlightRadar24: Add Track - No flight found by - {}".format(number)
+                )
         except Exception as e:
             self.logger.error("FlightRadar24: %s", e)
 
     async def remove_flight_track(self, number: str) -> None:
         if not self.scanning:
-            self.logger.error('FlightRadar24: API data fetching if OFF')
+            self.logger.error("FlightRadar24: API data fetching if OFF")
             return
 
-        remove = await self.hass.async_add_executor_job(self.flight.remove_track, number)
+        remove = await self.hass.async_add_executor_job(
+            self.flight.remove_track, number
+        )
         if not remove:
-            self.logger.error('FlightRadar24: Remove Track - No flight found by - {}'.format(number))
+            self.logger.error(
+                "FlightRadar24: Remove Track - No flight found by - {}".format(number)
+            )
 
     async def update_airport_track(self, code: str) -> None:
         if not self.scanning:
-            self.logger.error('FlightRadar24: API data fetching if OFF')
+            self.logger.error("FlightRadar24: API data fetching if OFF")
             return
 
         try:
@@ -91,7 +100,9 @@ class FlightRadar24Coordinator(DataUpdateCoordinator[int]):
         if not self.scanning:
             return
 
-        self.flight._auto_cleanup = self.config_entry.data.get(CONF_AUTO_CLEANUP, CONF_AUTO_CLEANUP_DEFAULT)
+        self.flight._auto_cleanup = self.config_entry.data.get(
+            CONF_AUTO_CLEANUP, CONF_AUTO_CLEANUP_DEFAULT
+        )
 
         try:
             await self.hass.async_add_executor_job(self.flight.update_flights_in_area)

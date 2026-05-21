@@ -1,6 +1,6 @@
 DEFAULT_NAME = "FlightRadar24"
 DOMAIN = "flightradar24"
-URL = 'https://www.flightradar24.com/'
+URL = "https://www.flightradar24.com/"
 
 CONF_MIN_ALTITUDE = "min_altitude"
 CONF_MAX_ALTITUDE = "max_altitude"

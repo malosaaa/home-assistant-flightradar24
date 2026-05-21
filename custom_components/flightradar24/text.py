@@ -4,7 +4,12 @@ from collections.abc import Callable
 from typing import Any
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import EntityCategory
-from homeassistant.components.text import TextEntity, TextEntityDescription, TextMode, RestoreEntity
+from homeassistant.components.text import (
+    TextEntity,
+    TextEntityDescription,
+    TextMode,
+    RestoreEntity,
+)
 from homeassistant.core import HomeAssistant
 from .const import DOMAIN
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
@@ -20,7 +25,9 @@ class FlightRadar24TextRequiredKeys:
 
 
 @dataclass
-class FlightRadar24TextEntityDescription(TextEntityDescription, FlightRadar24TextRequiredKeys):
+class FlightRadar24TextEntityDescription(
+    TextEntityDescription, FlightRadar24TextRequiredKeys
+):
     """A class that describes sensor entities."""
 
 
@@ -54,7 +61,7 @@ AIRPORT_SENSOR_TYPES: tuple[FlightRadar24TextEntityDescription, ...] = (
 
 
 async def async_setup_entry(
-        hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
+    hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
 ) -> None:
     coordinator = hass.data[DOMAIN][entry.entry_id]
 
@@ -67,19 +74,17 @@ async def async_setup_entry(
     async_add_entities(sensors, False)
 
 
-class FlightRadar24TextFlight(
-    CoordinatorEntity[FlightRadar24Coordinator], TextEntity
-):
+class FlightRadar24TextFlight(CoordinatorEntity[FlightRadar24Coordinator], TextEntity):
     _attr_has_entity_name = True
     entity_description: FlightRadar24TextEntityDescription
 
     def __init__(
-            self,
-            coordinator: FlightRadar24Coordinator,
-            description: FlightRadar24TextEntityDescription,
+        self,
+        coordinator: FlightRadar24Coordinator,
+        description: FlightRadar24TextEntityDescription,
     ) -> None:
         super().__init__(coordinator)
-        self._attr_native_value = ''
+        self._attr_native_value = ""
         self._attr_device_info = coordinator.device_info
         self._attr_unique_id = f"{coordinator.unique_id}_{DOMAIN}_{description.key}"
         self.entity_description = description
@@ -88,7 +93,7 @@ class FlightRadar24TextFlight(
         self._attr_native_value = value
         await self.entity_description.method(self.coordinator, value)
         self.async_write_ha_state()
-        self._attr_native_value = ''
+        self._attr_native_value = ""
 
 
 class FlightRadar24TextAirport(
@@ -98,12 +103,12 @@ class FlightRadar24TextAirport(
     entity_description: FlightRadar24TextEntityDescription
 
     def __init__(
-            self,
-            coordinator: FlightRadar24Coordinator,
-            description: FlightRadar24TextEntityDescription,
+        self,
+        coordinator: FlightRadar24Coordinator,
+        description: FlightRadar24TextEntityDescription,
     ) -> None:
         super().__init__(coordinator)
-        self._attr_native_value = ''
+        self._attr_native_value = ""
         self._attr_device_info = coordinator.device_info
         self._attr_unique_id = f"{coordinator.unique_id}_{DOMAIN}_{description.key}"
         self.entity_description = description
@@ -123,6 +128,10 @@ class FlightRadar24TextAirport(
         await super().async_added_to_hass()
 
         last_state = await self.async_get_last_state()
-        if last_state is not None and last_state.state not in ("unknown", "unavailable", ""):
+        if last_state is not None and last_state.state not in (
+            "unknown",
+            "unavailable",
+            "",
+        ):
             self._attr_native_value = last_state.state
             self.coordinator.airport.restore_code(self._attr_native_value)

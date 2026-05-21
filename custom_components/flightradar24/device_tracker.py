@@ -16,9 +16,9 @@ from .const import (
 
 
 async def async_setup_entry(
-        hass: HomeAssistant,
-        entry: ConfigEntry,
-        async_add_entities: AddEntitiesCallback,
+    hass: HomeAssistant,
+    entry: ConfigEntry,
+    async_add_entities: AddEntitiesCallback,
 ) -> None:
     coordinator = hass.data[DOMAIN][entry.entry_id]
     if not coordinator.enable_tracker:
@@ -37,19 +37,21 @@ async def async_setup_entry(
 
 
 @callback
-def update_items(coordinator: FlightRadar24Coordinator, tracked: FlightRadar24Tracker) -> None:
+def update_items(
+    coordinator: FlightRadar24Coordinator, tracked: FlightRadar24Tracker
+) -> None:
     if not coordinator.enable_tracker:
         return
 
     if not tracked.info:
         for flight in coordinator.flight.tracked.values():
-            if flight.get('tracked_type') == 'live':
+            if flight.get("tracked_type") == "live":
                 tracked.info = flight
                 break
     else:
-        flight = coordinator.flight.tracked.get(tracked.info['id'])
-        if flight and flight.get('tracked_type') == 'live':
-            tracked.info = coordinator.flight.tracked.get(tracked.info['id'])
+        flight = coordinator.flight.tracked.get(tracked.info["id"])
+        if flight and flight.get("tracked_type") == "live":
+            tracked.info = coordinator.flight.tracked.get(tracked.info["id"])
         else:
             tracked.info = {}
 
@@ -73,11 +75,11 @@ class FlightRadar24Tracker(CoordinatorEntity, TrackerEntity):
 
     @property
     def latitude(self) -> float | None:
-        return self.info.get('latitude')
+        return self.info.get("latitude")
 
     @property
     def longitude(self) -> float | None:
-        return self.info.get('longitude')
+        return self.info.get("longitude")
 
     @property
     def icon(self) -> str:
@@ -86,7 +88,7 @@ class FlightRadar24Tracker(CoordinatorEntity, TrackerEntity):
     @property
     def entity_picture(self) -> str | None:
         # This tells the map to show the actual photo of the plane!
-        return self.info.get('aircraft_photo_small')
+        return self.info.get("aircraft_photo_small")
 
     @property
     def name(self) -> str:
@@ -100,10 +102,12 @@ class FlightRadar24Tracker(CoordinatorEntity, TrackerEntity):
         )
 
         # Safely grab the flight data, falling back to 'N/A' if it's missing
-        callsign = self.info.get('callsign') or self.info.get('flight_number') or "Unknown"
-        reg = self.info.get('aircraft_registration') or callsign
-        origin = self.info.get('airport_origin_code_iata') or "N/A"
-        dest = self.info.get('airport_destination_code_iata') or "N/A"
+        callsign = (
+            self.info.get("callsign") or self.info.get("flight_number") or "Unknown"
+        )
+        reg = self.info.get("aircraft_registration") or callsign
+        origin = self.info.get("airport_origin_code_iata") or "N/A"
+        dest = self.info.get("airport_destination_code_iata") or "N/A"
 
         # Piece the string together based on their preference!
         if style == TRACKER_NAME_CALLSIGN_ROUTE:

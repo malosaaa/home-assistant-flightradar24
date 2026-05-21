@@ -43,25 +43,29 @@ _LOGGER = getLogger(__name__)
 
 
 class FlightRadarConfigFlow(ConfigFlow, domain=DOMAIN):
-
-    async def async_step_user(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+    async def async_step_user(
+        self, user_input: dict[str, Any] | None = None
+    ) -> FlowResult:
         if user_input is not None:
             return self.async_create_entry(title=DEFAULT_NAME, data=user_input)
 
-        return self.async_show_form(step_id="user", data_schema=self.add_suggested_values_to_schema(
-            vol.Schema(
+        return self.async_show_form(
+            step_id="user",
+            data_schema=self.add_suggested_values_to_schema(
+                vol.Schema(
+                    {
+                        vol.Required(CONF_RADIUS, default=1000): vol.Coerce(float),
+                        vol.Required(CONF_LATITUDE): cv.latitude,
+                        vol.Required(CONF_LONGITUDE): cv.longitude,
+                        vol.Required(CONF_SCAN_INTERVAL, default=10): int,
+                    }
+                ),
                 {
-                    vol.Required(CONF_RADIUS, default=1000): vol.Coerce(float),
-                    vol.Required(CONF_LATITUDE): cv.latitude,
-                    vol.Required(CONF_LONGITUDE): cv.longitude,
-                    vol.Required(CONF_SCAN_INTERVAL, default=10): int,
-                }
+                    CONF_LATITUDE: self.hass.config.latitude,
+                    CONF_LONGITUDE: self.hass.config.longitude,
+                },
             ),
-            {
-                CONF_LATITUDE: self.hass.config.latitude,
-                CONF_LONGITUDE: self.hass.config.longitude,
-            },
-        ))
+        )
 
     @staticmethod
     @callback
@@ -70,8 +74,9 @@ class FlightRadarConfigFlow(ConfigFlow, domain=DOMAIN):
 
 
 class FlightRadarOptionsFlow(OptionsFlowWithConfigEntry):
-
-    async def async_step_init(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+    async def async_step_init(
+        self, user_input: dict[str, Any] | None = None
+    ) -> FlowResult:
         errors = {}
         data = user_input or self.config_entry.data
 
@@ -82,56 +87,99 @@ class FlightRadarOptionsFlow(OptionsFlowWithConfigEntry):
             try:
                 if username and password:
                     client = FlightRadar24API()
-                    await self.hass.async_add_executor_job(client.login, username, password)
+                    await self.hass.async_add_executor_job(
+                        client.login, username, password
+                    )
                 elif password and not username or username and not password:
-                    errors['base'] = 'You need to pass username and password'
+                    errors["base"] = "You need to pass username and password"
             except Exception as error:
-                _LOGGER.error('FlightRadar24 Integration Exception - {}'.format(error))
-                errors['base'] = str(error)
+                _LOGGER.error("FlightRadar24 Integration Exception - {}".format(error))
+                errors["base"] = str(error)
 
             if not errors:
-                self.hass.config_entries.async_update_entry(self.config_entry, data=user_input)
+                self.hass.config_entries.async_update_entry(
+                    self.config_entry, data=user_input
+                )
                 return self.async_create_entry(title=DEFAULT_NAME, data=user_input)
 
-        data_schema = vol.Schema({
-            vol.Required(CONF_RADIUS, default=data.get(CONF_RADIUS)): vol.Coerce(float),
-            vol.Required(CONF_LATITUDE, default=data.get(CONF_LATITUDE)): cv.latitude,
-            vol.Required(CONF_LONGITUDE, default=data.get(CONF_LONGITUDE)): cv.longitude,
-            vol.Required(CONF_SCAN_INTERVAL, default=data.get(CONF_SCAN_INTERVAL)): int,
-            vol.Optional(CONF_MIN_ALTITUDE,
-                         description={"suggested_value": data.get(CONF_MIN_ALTITUDE, MIN_ALTITUDE)}): int,
-            vol.Optional(CONF_MAX_ALTITUDE,
-                         description={"suggested_value": data.get(CONF_MAX_ALTITUDE, MAX_ALTITUDE)}): int,
-            vol.Optional(CONF_MOST_TRACKED,
-                         description={
-                             "suggested_value": data.get(CONF_MOST_TRACKED, CONF_MOST_TRACKED_DEFAULT)}): cv.boolean,
-            vol.Optional(CONF_ENABLE_TRACKER,
-                         description={
-                             "suggested_value": data.get(CONF_ENABLE_TRACKER,
-                                                         CONF_ENABLE_TRACKER_DEFAULT)}): cv.boolean,
-            vol.Optional(CONF_AUTO_CLEANUP,
-                         description={
-                             "suggested_value": data.get(CONF_AUTO_CLEANUP,
-                                                         CONF_AUTO_CLEANUP_DEFAULT)}): cv.boolean,
-            vol.Optional(
-                CONF_TRACKER_NAME_STYLE,
-                default=data.get(
-                    CONF_TRACKER_NAME_STYLE,
-                    CONF_TRACKER_NAME_DEFAULT,
+        data_schema = vol.Schema(
+            {
+                vol.Required(CONF_RADIUS, default=data.get(CONF_RADIUS)): vol.Coerce(
+                    float
                 ),
-            ): vol.In(
-                {
-                    TRACKER_NAME_CALLSIGN: "Callsign Only (e.g., KLM1412)",
-                    TRACKER_NAME_CALLSIGN_ROUTE: (
-                        "Callsign + Route (e.g., KLM1412 (CDG - AMS))"
+                vol.Required(
+                    CONF_LATITUDE, default=data.get(CONF_LATITUDE)
+                ): cv.latitude,
+                vol.Required(
+                    CONF_LONGITUDE, default=data.get(CONF_LONGITUDE)
+                ): cv.longitude,
+                vol.Required(
+                    CONF_SCAN_INTERVAL, default=data.get(CONF_SCAN_INTERVAL)
+                ): int,
+                vol.Optional(
+                    CONF_MIN_ALTITUDE,
+                    description={
+                        "suggested_value": data.get(CONF_MIN_ALTITUDE, MIN_ALTITUDE)
+                    },
+                ): int,
+                vol.Optional(
+                    CONF_MAX_ALTITUDE,
+                    description={
+                        "suggested_value": data.get(CONF_MAX_ALTITUDE, MAX_ALTITUDE)
+                    },
+                ): int,
+                vol.Optional(
+                    CONF_MOST_TRACKED,
+                    description={
+                        "suggested_value": data.get(
+                            CONF_MOST_TRACKED, CONF_MOST_TRACKED_DEFAULT
+                        )
+                    },
+                ): cv.boolean,
+                vol.Optional(
+                    CONF_ENABLE_TRACKER,
+                    description={
+                        "suggested_value": data.get(
+                            CONF_ENABLE_TRACKER, CONF_ENABLE_TRACKER_DEFAULT
+                        )
+                    },
+                ): cv.boolean,
+                vol.Optional(
+                    CONF_AUTO_CLEANUP,
+                    description={
+                        "suggested_value": data.get(
+                            CONF_AUTO_CLEANUP, CONF_AUTO_CLEANUP_DEFAULT
+                        )
+                    },
+                ): cv.boolean,
+                vol.Optional(
+                    CONF_TRACKER_NAME_STYLE,
+                    default=data.get(
+                        CONF_TRACKER_NAME_STYLE,
+                        CONF_TRACKER_NAME_DEFAULT,
                     ),
-                    TRACKER_NAME_REG_ROUTE: (
-                        "Registration + Route (e.g., PH-BXE (CDG - AMS))"
-                    ),
-                }
-            ),
-            vol.Optional(CONF_USERNAME, description={"suggested_value": data.get(CONF_USERNAME, '')}): cv.string,
-            vol.Optional(CONF_PASSWORD, description={"suggested_value": data.get(CONF_PASSWORD, '')}): cv.string,
-        })
+                ): vol.In(
+                    {
+                        TRACKER_NAME_CALLSIGN: "Callsign Only (e.g., KLM1412)",
+                        TRACKER_NAME_CALLSIGN_ROUTE: (
+                            "Callsign + Route (e.g., KLM1412 (CDG - AMS))"
+                        ),
+                        TRACKER_NAME_REG_ROUTE: (
+                            "Registration + Route (e.g., PH-BXE (CDG - AMS))"
+                        ),
+                    }
+                ),
+                vol.Optional(
+                    CONF_USERNAME,
+                    description={"suggested_value": data.get(CONF_USERNAME, "")},
+                ): cv.string,
+                vol.Optional(
+                    CONF_PASSWORD,
+                    description={"suggested_value": data.get(CONF_PASSWORD, "")},
+                ): cv.string,
+            }
+        )
 
-        return self.async_show_form(step_id="init", data_schema=data_schema, errors=errors)
+        return self.async_show_form(
+            step_id="init", data_schema=data_schema, errors=errors
+        )
