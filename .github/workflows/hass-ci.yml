@@ -1,3 +1,4 @@
+#CREATED BY DONTRANQUIL 
 name: Home Assistant CI
 
 on:
@@ -26,10 +27,10 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v5
         with:
           python-version: "3.13"
 
@@ -41,4 +42,4 @@ jobs:
 
       - name: Run tests
         run: |
-          pytest -v tests/ --cov=custom_components/airplanes_live/ --cov-report=xml
+          pytest -v tests/ --cov=custom_components/flightradar24/ --cov-report=xml
