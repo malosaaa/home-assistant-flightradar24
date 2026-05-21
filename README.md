@@ -1,7 +1,53 @@
 # Flightradar24 integration for Home Assistant
-[![version](https://img.shields.io/github/manifest-json/v/AlexandrErohin/home-assistant-flightradar24?filename=custom_components%2Fflightradar24%2Fmanifest.json&color=slateblue)](https://github.com/AlexandrErohin/home-assistant-flightradar24/releases/latest)
-[![HACS](https://img.shields.io/badge/HACS-Default-orange.svg?logo=HomeAssistantCommunityStore&logoColor=white)](https://github.com/hacs/integration)
-[![Community Forum](https://img.shields.io/static/v1.svg?label=Community&message=Forum&color=41bdf5&logo=HomeAssistant&logoColor=white)](https://community.home-assistant.io/t/custom-component-flightradar24)
+<p align="center">
+  <a href="https://github.com/malosaaa/home-assistant-flightradar24/releases">
+    <img src="https://img.shields.io/github/v/release/malosaaa/home-assistant-flightradar24?style=for-the-badge&color=007ec6" alt="Latest Release">
+  </a>
+  <a href="https://github.com/malosaaa/home-assistant-flightradar24/blob/main/LICENSE">
+    <img src="https://img.shields.io/github/license/malosaaa/home-assistant-flightradar24?style=for-the-badge&color=007ec6" alt="License">
+  </a>
+  <a href="https://github.com/malosaaa/home-assistant-flightradar24/actions/workflows/hass-ci.yml">
+    <img src="https://github.com/malosaaa/home-assistant-flightradar24/actions/workflows/hass-ci.yml/badge.svg" alt="Home Assistant CI" style="height:28px;">
+  </a>
+
+  <a href="https://github.com/malosaaa/home-assistant-flightradar24/actions">
+    <img src="https://img.shields.io/github/actions/workflow/status/malosaaa/home-assistant-flightradar24/codechecker.yml?style=for-the-badge&label=CODE%20CHECKS&color=5dbb0f" alt="Code Checks">
+  </a>
+  <a href="https://github.com/malosaaa/home-assistant-flightradar24/actions">
+    <img src="https://img.shields.io/github/actions/workflow/status/malosaaa/home-assistant-flightradar24/pytest.yml?style=for-the-badge&label=TESTS&color=5dbb0f" alt="Tests">
+  </a>
+  <a href="https://github.com/malosaaa/home-assistant-flightradar24/actions">
+    <img src="https://img.shields.io/github/actions/workflow/status/malosaaa/home-assistant-flightradar24/hacs.yaml?style=for-the-badge&label=HACS%20VALIDATION&color=5dbb0f" alt="HACS Validation">
+  </a>
+
+  <a href="https://github.com/pre-commit/pre-commit">
+    <img src="https://img.shields.io/badge/pre--commit-enabled-5dbb0f?style=for-the-badge" alt="pre-commit">
+  </a>
+  <a href="https://github.com/astral-sh/ruff">
+    <img src="https://img.shields.io/badge/code%20style-ruff-000000?style=for-the-badge" alt="Ruff">
+  </a>
+  <a href="https://codecov.io/gh/malosaaa/home-assistant-flightradar24">
+    <img src="https://codecov.io/gh/malosaaa/home-assistant-flightradar24/branch/main/graph/badge.svg" alt="Coverage" style="height:28px;">
+  </a>
+
+  <a href="https://hacs.xyz/">
+    <img src="https://img.shields.io/badge/HACS-CUSTOM-ff6e27?style=for-the-badge" alt="HACS">
+  </a>
+  <a href="https://www.home-assistant.io/">
+    <img src="https://img.shields.io/badge/Home%20Assistant-2024.5%2B-007ec6?style=for-the-badge" alt="Home Assistant">
+  </a>
+
+  <a href="https://github.com/malosaaa">
+    <img src="https://img.shields.io/badge/maintainer-%40malosaaa-007ec6?style=for-the-badge" alt="Maintainer">
+  </a>
+  <a href="https://ko-fi.com/malosaaa">
+    <img src="https://img.shields.io/badge/buy%20me%20a%20coffee-donate-ffdd00?style=for-the-badge" alt="Donate">
+  </a>
+  <a href="https://community.home-assistant.io/">
+    <img src="https://img.shields.io/badge/community-forum-007ec6?style=for-the-badge" alt="Community">
+  </a>
+</p>
+
 
 Flightradar24 integration allows one to track overhead flights in a given region or particular planes. It will also fire Home Assistant events when flights enter/exit/landed/took off. Or monitor departures and arrivals at an airport
 
