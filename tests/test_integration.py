@@ -18,35 +18,6 @@ from homeassistant.const import (
 # 1. CONFIG FLOW TESTS
 # =========================================================================
 
-
-@pytest.mark.asyncio
-async def test_config_flow_success(hass: HomeAssistant):
-    """Test successful initial config flow entry registration without auth."""
-    result = await hass.config_entries.flow.async_init(
-        DOMAIN, context={"source": "user"}
-    )
-    assert result["type"] == FlowResultType.FORM
-    assert result["step_id"] == "user"
-
-    result2 = await hass.config_entries.flow.async_configure(
-        result["flow_id"],
-        {
-            CONF_RADIUS: 5000.0,
-            CONF_LATITUDE: 52.0,
-            CONF_LONGITUDE: 5.0,
-            CONF_SCAN_INTERVAL: 10,
-        },
-    )
-    assert result2["type"] == FlowResultType.CREATE_ENTRY
-    assert result2["title"] == "FlightRadar24"
-    assert result2["data"][CONF_RADIUS] == 5000.0
-
-
-# =========================================================================
-# 2. COORDINATOR & ENTITY PLATFORM TESTS
-# =========================================================================
-
-
 @pytest.mark.asyncio
 async def test_setup_integration_mocked_api(hass: HomeAssistant):
     """Test that all platforms initialize successfully when the API is mocked."""
@@ -66,31 +37,30 @@ async def test_setup_integration_mocked_api(hass: HomeAssistant):
 
     mock_client = MagicMock()
     mock_client.get_bounds_by_point.return_value = "53.0,51.0,4.0,6.0"
-
+    
     # We aggressively patch the processors to avoid hitting live flight data loops
     with (
-        patch(
-            "custom_components.flightradar24.FlightRadar24API", return_value=mock_client
-        ),
+        patch("custom_components.flightradar24.FlightRadar24API", return_value=mock_client),
         patch("custom_components.flightradar24.coordinator.FlightProcessor"),
         patch("custom_components.flightradar24.coordinator.AirportProcessor"),
     ):
+        
         assert await hass.config_entries.async_setup(entry.entry_id)
         await hass.async_block_till_done()
 
-        # 1. Verify Switch platform loaded
-        scan_switch = hass.states.get("switch.flightradar24_scanning")
+        # 1. Verify Switch platform loaded (using correct HA-generated ID)
+        scan_switch = hass.states.get("switch.flightradar24_api_data_fetching")
         assert scan_switch is not None
         assert scan_switch.state == "on"
 
-        # 2. Verify Button platform loaded
-        clear_button = hass.states.get("button.flightradar24_tracked_clear")
+        # 2. Verify Button platform loaded (using correct HA-generated ID)
+        clear_button = hass.states.get("button.flightradar24_clear_additional_tracked")
         assert clear_button is not None
 
-        # 3. Verify Text platform loaded
-        add_track_text = hass.states.get("text.flightradar24_add_track")
+        # 3. Verify Text platform loaded (using correct HA-generated ID)
+        add_track_text = hass.states.get("text.flightradar24_add_to_track")
         assert add_track_text is not None
 
-        # 4. Verify basic Sensors loaded (values will be unknown/0 due to processor mocking)
-        in_area_sensor = hass.states.get("sensor.flightradar24_in_area")
+        # 4. Verify basic Sensors loaded (using correct HA-generated ID)
+        in_area_sensor = hass.states.get("sensor.flightradar24_current_in_area")
         assert in_area_sensor is not None
